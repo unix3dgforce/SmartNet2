@@ -17,6 +17,8 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.android.internal.telephony.ITelephony;
+import com.android.internal.telephony.RILConstants;
+
 import java.lang.reflect.Method;
 
 public class SmartNet {
