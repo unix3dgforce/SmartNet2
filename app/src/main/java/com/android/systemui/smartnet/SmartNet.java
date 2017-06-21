@@ -85,7 +85,7 @@ public class SmartNet {
 
         if (mCoreDualSim.isDualSIM()){
             SimCard  = MiuiCoreSettingsPreference.getKeyParam(mContext,"mobiledata_SIM_Select");
-            Log.d("SmartNet2.0","setSimPreferredNetworkType(I)V: SIMid[0]="+SIMid[0]+" SIMid[1]="+SIMid[1]+ " isSIM2Ready()="+mCoreDualSim.isSIM2Ready() + " Network Type=" + networkType + " SIMCard="+SimCard);
+            //Log.d("SmartNet2.0","setSimPreferredNetworkType(I)V: SIMid[0]="+SIMid[0]+" SIMid[1]="+SIMid[1]+ " isSIM2Ready()="+mCoreDualSim.isSIM2Ready() + " Network Type=" + networkType + " SIMCard="+SimCard);
             switch (SimCard){
                 case 1:
                     setPreferredNetworkType(SIMid[0],networkType);
@@ -112,7 +112,7 @@ public class SmartNet {
         if (mITelephony != null) {
             try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    Log.d("SmartNet2.0", "setPreferredNetworkType(II)V: [SubId]: " + SIMid + " Network Type: " + networkType);
+                    //Log.d("SmartNet2.0", "setPreferredNetworkType(II)V: [SubId]: " + SIMid + " Network Type: " + networkType);
                     mITelephony.setPreferredNetworkType(SIMid,networkType);
                     return;
                 }
@@ -169,7 +169,7 @@ public class SmartNet {
                 setStateWiFiData(!CallState);
                 setStateMobileData(!CallState);
             }
-            Log.d("SmartNet2.0", "setCallPreferredNetworkType(Z)V: Network Type: " + networkType +" lastStateMobileData="+lastStateMobileData+" lastStateWiFiData="+lastStateWiFiData+" dataTransfer="+dataTransfer);
+            //Log.d("SmartNet2.0", "setCallPreferredNetworkType(Z)V: Network Type: " + networkType +" lastStateMobileData="+lastStateMobileData+" lastStateWiFiData="+lastStateWiFiData+" dataTransfer="+dataTransfer);
         }else{
             //int lastStateMobileData = MiuiCoreSettingsPreference.getKeyParam(mContext, "smartnet_mobiledata_laststate");
             //int lastStateWiFiData = MiuiCoreSettingsPreference.getKeyParam(mContext, "smartnet_wifidata_laststate");
@@ -187,7 +187,7 @@ public class SmartNet {
                 if (lastStateMobileData != 0) {setStateMobileData(!CallState);}
                 if (lastStateWiFiData != 0) {setStateWiFiData(!CallState);}
             }
-            Log.d("SmartNet2.0", "setCallPreferredNetworkType(Z)V: Network Type: " + networkType +" lastStateMobileData="+lastStateMobileData+" lastStateWiFiData="+lastStateWiFiData+" dataTransfer="+dataTransfer);
+            //sdfgdfgfdgLog.d("SmartNet2.0", "setCallPreferredNetworkType(Z)V: Network Type: " + networkType +" lastStateMobileData="+lastStateMobileData+" lastStateWiFiData="+lastStateWiFiData+" dataTransfer="+dataTransfer);
         }
         if (networkType >= 0) {
             setPreferredNetworkType(SIMid,networkType);
