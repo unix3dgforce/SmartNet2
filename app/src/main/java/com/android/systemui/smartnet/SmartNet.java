@@ -187,7 +187,7 @@ public class SmartNet {
                 if (lastStateMobileData != 0) {setStateMobileData(!CallState);}
                 if (lastStateWiFiData != 0) {setStateWiFiData(!CallState);}
             }
-            //sdfgdfgfdgLog.d("SmartNet2.0", "setCallPreferredNetworkType(Z)V: Network Type: " + networkType +" lastStateMobileData="+lastStateMobileData+" lastStateWiFiData="+lastStateWiFiData+" dataTransfer="+dataTransfer);
+            //Log.d("SmartNet2.0", "setCallPreferredNetworkType(Z)V: Network Type: " + networkType +" lastStateMobileData="+lastStateMobileData+" lastStateWiFiData="+lastStateWiFiData+" dataTransfer="+dataTransfer);
         }
         if (networkType >= 0) {
             setPreferredNetworkType(SIMid,networkType);
