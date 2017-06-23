@@ -299,14 +299,15 @@ public class SmartNet {
             SmartNet mSmartNet = SmartNet.this;
             String mIntent = intent.getAction();
             //Log.d("SmartNet2.0","Intent="+mIntent);
+            if("android.intent.action.PHONE_STATE".equals(mIntent)){
+                CallIntentAction(intent);
+            }
             if (("android.intent.action.ANY_DATA_STATE".equals(mIntent)) ||
                     ("my.settings.CHANGE_SMART_MOBILE_NETWORK".equals(mIntent)) ||
                     ("android.intent.action.BOOT_COMPLETED".equals(mIntent))) {
                 mSmartNet.handleMobileData();
             }
-            if("android.intent.action.PHONE_STATE".equals(mIntent)){
-                CallIntentAction(intent);
-            }
+
         }
     }
 
