@@ -22,9 +22,11 @@ import android.widget.*;
 
 import com.android.internal.telephony.ISub;
 import com.android.internal.telephony.ITelephony;
+import com.android.internal.telephony.RILConstants;
 import com.android.internal.telephony.TelephonyIntents;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -191,6 +193,13 @@ public class SmartNetActivity extends AppCompatActivity {
         return wifiInfo.getState() == NetworkInfo.State.CONNECTED;
     }
 
+    private int getCurentNetworkType(){
+        ConnectivityManager connectivityManager =(ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkType = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        return networkType.getType();
+    }
+
+
         @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -201,8 +210,15 @@ public class SmartNetActivity extends AppCompatActivity {
         //returnNetworkType();
 
             mContext=getApplicationContext();
-            getStateWiFiData();
-            getConnectedWiFiData();
+            //getStateWiFiData();
+            //getConnectedWiFiData();
+            ITelephony mITelephony = ITelephony.Stub.asInterface(ServiceManager.checkService("phone"));
+
+            String active_network = ((ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo().getSubtypeName();
+            TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+            tm.getNetworkType();
+            getCurentNetworkType();
+
             //SmartNet mSmartNet = new SmartNet(mContext);
             //mTelephonyManager = new TelephonyManager(getApplicationContext());
             //getStateMobileData();

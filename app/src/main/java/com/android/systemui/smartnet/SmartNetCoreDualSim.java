@@ -49,7 +49,8 @@ public class SmartNetCoreDualSim {
 
         TelephonyManager telephonyManager = ((TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE));
         mSmartNetCoreDualSim.mSubscriptionId = getSubId(context);
-        mSmartNetCoreDualSim.imeiSIM1 = telephonyManager.getDeviceId();
+        //mSmartNetCoreDualSim.imeiSIM1 = telephonyManager.getDeviceId();
+        mSmartNetCoreDualSim.imeiSIM1 = null;
         mSmartNetCoreDualSim.imeiSIM2 = null;
 
         try{
@@ -68,7 +69,8 @@ public class SmartNetCoreDualSim {
             }
         }
 
-        mSmartNetCoreDualSim.isSIM1Ready = telephonyManager.getSimState() == TelephonyManager.SIM_STATE_READY;
+        //mSmartNetCoreDualSim.isSIM1Ready = telephonyManager.getSimState() == TelephonyManager.SIM_STATE_READY;
+        mSmartNetCoreDualSim.isSIM1Ready = false;
         mSmartNetCoreDualSim.isSIM2Ready = false;
 
         try {
