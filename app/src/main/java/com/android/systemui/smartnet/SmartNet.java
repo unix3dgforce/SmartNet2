@@ -439,7 +439,9 @@ public class SmartNet {
 
             @Override
             public void onTick(long l) {
-                Log.d("SmartNet2.0","setTimer(I)V: Switching seconds remaining: " + l / 1000);
+                if (l / 1000 <= 10) {
+                    Log.d("SmartNet2.0", "setTimer(I)V: Switching seconds remaining: " + l / 1000);
+                }
             }
 
             @Override
@@ -469,11 +471,11 @@ public class SmartNet {
                         cTimer.cancel();
                         cTimer = null;
                         timerStart = false;
-                        Log.d("SmartNet2.0", "TimerIntentAction(Z)V: Kill Timer");
+                        Log.d("SmartNet2.0", "TimerIntentAction(Z)V: Cancel Timer");
                     }
                 }
             } else {
-                if ((!timerStart) && (!chargingState)) {
+                if ((!timerStart) && (!chargingState) && (!CallState)) {
                     //Save Network Type Start Timer
                     saveCurrentPrefferedNetworkType();
                     setTimer(timeToCompletion);
