@@ -7,7 +7,9 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
+import android.os.BatteryManager;
 import android.os.Build;
+import android.os.CountDownTimer;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.preference.MiuiCoreSettingsPreference;
@@ -34,6 +36,10 @@ public class SmartNet {
     private static int lastStateWiFiData = 0;
     private static int lastStateNetworkTypeSIM1 = 0;
     private static int lastStateNetworkTypeSIM2 = 0;
+    private static boolean timerDone = false;
+    private static boolean timerStart = false;
+    private static CountDownTimer cTimer = null;
+    private static boolean chargingState = false;
 
 
 
@@ -380,6 +386,8 @@ public class SmartNet {
         mIntentFilter.addAction("my.settings.CHANGE_SMART_MOBILE_NETWORK");
         mIntentFilter.addAction("android.intent.action.BOOT_COMPLETED");
         mIntentFilter.addAction("android.intent.action.PHONE_STATE");
+        mIntentFilter.addAction("android.intent.action.SCREEN_ON");
+        mIntentFilter.addAction("android.intent.action.SCREEN_OFF");
         context.registerReceiver(mIntent,mIntentFilter);
     }
 
@@ -426,6 +434,60 @@ public class SmartNet {
         Log.d("SmartNet2.0","CallState="+CallState + " SmartNetLastState="+SmartNetLastState);
     }
 
+    private void setTimer(int value){
+        cTimer = new CountDownTimer(value,1000){
+
+            @Override
+            public void onTick(long l) {
+                Log.d("SmartNet2.0","setTimer(I)V: Switching seconds remaining: " + l / 1000);
+            }
+
+            @Override
+            public void onFinish() {
+                timerDone = true;
+                timerStart = false;
+                Log.d("SmartNet2.0","setTimer(I)V: Switch network type");
+            }
+        };
+    }
+
+
+    private void TimerIntentAction(boolean state){
+        if (state){
+            if ((timerDone) && (cTimer !=null)) {
+                //Restore NetworkType
+                cTimer = null;
+                timerDone = false;
+                Log.d("SmartNet2.0", "TimerIntentAction(Z)V: Restore Network Type");
+            }else {
+                //Cancel Timer
+                if((timerStart) && (cTimer !=null)) {
+                    cTimer.cancel();
+                    cTimer = null;
+                    timerStart = false;
+                    Log.d("SmartNet2.0", "TimerIntentAction(Z)V: Kill Timer");
+                }
+            }
+        }else{
+            if ((!timerStart) && (!chargingState)) {
+                //Save Network Type Start Timer
+                int timeToCompletion = MiuiCoreSettingsPreference.getKeyParam(mContext,"smartnet_timer_value");
+                setTimer(timeToCompletion);
+                cTimer.start();
+                timerStart = true;
+                Log.d("SmartNet2.0", "TimerIntentAction(Z)V: Start Timer");
+
+            }
+        }
+
+    }
+
+    private void BatteryCharging(Intent mIntent){
+        int status = mIntent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+        chargingState = status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL;
+    }
+
+
     class Receiver extends BroadcastReceiver{
 
         @Override
@@ -440,6 +502,16 @@ public class SmartNet {
                     ("my.settings.CHANGE_SMART_MOBILE_NETWORK".equals(mIntent)) ||
                     ("android.intent.action.BOOT_COMPLETED".equals(mIntent))) {
                 mSmartNet.handleMobileData();
+            }
+            if ("android.intent.action.SCREEN_ON".equals(mIntent)) {
+                TimerIntentAction(true);
+            }
+            if ("android.intent.action.SCREEN_OFF".equals(mIntent)) {
+                TimerIntentAction(false);
+            }
+
+            if ("android.intent.action.BATTERY_CHANGED".equals(mIntent)){
+                BatteryCharging(intent);
             }
 
         }
