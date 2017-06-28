@@ -452,34 +452,39 @@ public class SmartNet {
     }
 
 
-    private void TimerIntentAction(boolean state){
-        if (state){
-            if ((timerDone) && (cTimer !=null)) {
-                //Restore NetworkType
-                cTimer = null;
-                timerDone = false;
-                Log.d("SmartNet2.0", "TimerIntentAction(Z)V: Restore Network Type");
-            }else {
-                //Cancel Timer
-                if((timerStart) && (cTimer !=null)) {
-                    cTimer.cancel();
+    private void TimerIntentAction(boolean state) {
+        int timeToCompletion = MiuiCoreSettingsPreference.getKeyParam(mContext, "smartnet_timer_value");
+        if (timeToCompletion > 0) {
+            if (state) {
+                if ((timerDone) && (cTimer != null)) {
+                    //Restore NetworkType
+                    //restoreCurrentPrefferedNetworkType();
                     cTimer = null;
-                    timerStart = false;
-                    Log.d("SmartNet2.0", "TimerIntentAction(Z)V: Kill Timer");
+                    timerDone = false;
+                    Log.d("SmartNet2.0", "TimerIntentAction(Z)V: Restore Network Type");
+                } else {
+                    //Cancel Timer
+                    if ((timerStart) && (cTimer != null)) {
+                        cTimer.cancel();
+                        cTimer = null;
+                        timerStart = false;
+                        Log.d("SmartNet2.0", "TimerIntentAction(Z)V: Kill Timer");
+                    }
+                }
+            } else {
+                if ((!timerStart) && (!chargingState)) {
+                    //Save Network Type Start Timer
+                    //saveCurrentPrefferedNetworkType();
+
+                    setTimer(timeToCompletion);
+                    cTimer.start();
+                    timerStart = true;
+                    Log.d("SmartNet2.0", "TimerIntentAction(Z)V: Start Timer");
+
                 }
             }
-        }else{
-            if ((!timerStart) && (!chargingState)) {
-                //Save Network Type Start Timer
-                int timeToCompletion = MiuiCoreSettingsPreference.getKeyParam(mContext,"smartnet_timer_value");
-                setTimer(timeToCompletion);
-                cTimer.start();
-                timerStart = true;
-                Log.d("SmartNet2.0", "TimerIntentAction(Z)V: Start Timer");
 
-            }
         }
-
     }
 
     private void BatteryCharging(Intent mIntent){
