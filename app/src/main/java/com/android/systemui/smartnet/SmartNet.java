@@ -446,6 +446,7 @@ public class SmartNet {
             public void onFinish() {
                 timerDone = true;
                 timerStart = false;
+                setPreferredNetworkType(mCoreDualSim.getSubscriptionId(),getRILConstants("GSM_ONLY"));
                 Log.d("SmartNet2.0","setTimer(I)V: Switch network type");
             }
         };
@@ -458,7 +459,7 @@ public class SmartNet {
             if (state) {
                 if ((timerDone) && (cTimer != null)) {
                     //Restore NetworkType
-                    //restoreCurrentPrefferedNetworkType();
+                    restoreCurrentPrefferedNetworkType();
                     cTimer = null;
                     timerDone = false;
                     Log.d("SmartNet2.0", "TimerIntentAction(Z)V: Restore Network Type");
@@ -474,8 +475,7 @@ public class SmartNet {
             } else {
                 if ((!timerStart) && (!chargingState)) {
                     //Save Network Type Start Timer
-                    //saveCurrentPrefferedNetworkType();
-
+                    saveCurrentPrefferedNetworkType();
                     setTimer(timeToCompletion);
                     cTimer.start();
                     timerStart = true;
