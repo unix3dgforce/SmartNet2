@@ -14,6 +14,7 @@ import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.preference.MiuiCoreSettingsPreference;
 import android.provider.Settings;
+import android.provider.Telephony;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
@@ -22,6 +23,8 @@ import com.android.internal.telephony.RILConstants;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SmartNet {
     private ConnectivityManager mConnectivityManager;
@@ -39,6 +42,7 @@ public class SmartNet {
     private static boolean timerStart = false;
     private static CountDownTimer cTimer = null;
     private static boolean chargingState = false;
+    private static Map networkTypeHash = new HashMap();
 
 
 
@@ -74,13 +78,13 @@ public class SmartNet {
             if (getStateWiFiData() && getConnectedWiFiData()){ setPreferredNetworkTypeWiFiOn(); return;}
             if (mConnectivityManager != null){
                 if (mConnectivityManager.getMobileDataEnabled()){
-                    networkType = MiuiCoreSettingsPreference.getKeyParam(mContext,"mobiledata_on");
+                    networkType = checkRILConstants(MiuiCoreSettingsPreference.getKeyParam(mContext,"mobiledata_on"));
                     //networkType = getRILConstants(Settings.System.getString(mContext.getContentResolver(),"mobiledata_on"));
                     if (networkType >= 0){
                         setSimPreferredNetworkType(networkType);
                     }
                 } else {
-                    networkType = MiuiCoreSettingsPreference.getKeyParam(mContext,"mobiledata_off");
+                    networkType = checkRILConstants(MiuiCoreSettingsPreference.getKeyParam(mContext,"mobiledata_off"));
                     //networkType = getRILConstants(Settings.System.getString(mContext.getContentResolver(),"mobiledata_off"));
                     if (networkType >= 0) {
                         setSimPreferredNetworkType(networkType);
@@ -189,7 +193,7 @@ public class SmartNet {
         MobileDataTransfer = MiuiCoreSettingsPreference.getKeyParam(mContext,"smartnet_mobile_data_transfer");
         if (CallState) {
             saveCurrentPrefferedNetworkType();
-            networkType = MiuiCoreSettingsPreference.getKeyParam(mContext, "call_mobiledata");
+            networkType = checkRILConstants(MiuiCoreSettingsPreference.getKeyParam(mContext, "call_mobiledata"));
             //networkType = getRILConstants(Settings.System.getString(mContext.getContentResolver(),"call_mobiledata"));
                 //Settings.System.putInt(mContext.getContentResolver(), "smartnet_mobiledata_laststate", (getStateMobileData() ? 1 : 0));
                 //Settings.System.putInt(mContext.getContentResolver(), "smartnet_wifidata_laststate", (getStateWiFiData() ? 1 : 0));
@@ -206,11 +210,11 @@ public class SmartNet {
             //int lastStateMobileData = MiuiCoreSettingsPreference.getKeyParam(mContext, "smartnet_mobiledata_laststate");
             //int lastStateWiFiData = MiuiCoreSettingsPreference.getKeyParam(mContext, "smartnet_wifidata_laststate");
             if (lastStateWiFiData != 0) {
-                networkType = MiuiCoreSettingsPreference.getKeyParam(mContext, "mobiledata_WiFiOn");
+                networkType = checkRILConstants(MiuiCoreSettingsPreference.getKeyParam(mContext, "mobiledata_WiFiOn"));
                 //networkType = getRILConstants(Settings.System.getString(mContext.getContentResolver(),"mobiledata_WiFiOn"));
             }else {
                 if (lastStateMobileData != 0) {
-                    networkType = MiuiCoreSettingsPreference.getKeyParam(mContext, "mobiledata_on");
+                    networkType = checkRILConstants(MiuiCoreSettingsPreference.getKeyParam(mContext, "mobiledata_on"));
                     //networkType = getRILConstants(Settings.System.getString(mContext.getContentResolver(),"mobiledata_on"));
                 } else {
                     restoreCurrentPrefferedNetworkType();
@@ -315,7 +319,7 @@ public class SmartNet {
     public void setPreferredNetworkTypeWiFiOn() {
         int networkType;
         int[] SIMid = mCoreDualSim.getSubscriptionId();
-        networkType = MiuiCoreSettingsPreference.getKeyParam(mContext, "mobiledata_WiFiOn");
+        networkType = checkRILConstants(MiuiCoreSettingsPreference.getKeyParam(mContext, "mobiledata_WiFiOn"));
         //networkType = getRILConstants(Settings.System.getString(mContext.getContentResolver(),"mobiledata_WiFiOn"));
         switch (networkType) {
             case -1:
@@ -390,21 +394,49 @@ public class SmartNet {
         context.registerReceiver(mIntent,mIntentFilter);
     }
 
-    private int getRILConstants(String nameNetworkType){
+    private int checkRILConstants(int networkType){
         String value;
         int result;
-        value = "NETWORK_MODE_".concat(nameNetworkType);
+        if (networkTypeHash.size() == 0 ){
+            String[] NetworkTypeString ={"NETWORK_MODE_WCDMA_PREF",
+                    "NETWORK_MODE_GSM_ONLY",
+                    "NETWORK_MODE_WCDMA_ONLY",
+                    "NETWORK_MODE_GSM_UMTS",
+                    "NETWORK_MODE_CDMA",
+                    "NETWORK_MODE_CDMA_NO_EVDO",
+                    "NETWORK_MODE_EVDO_NO_CDMA",
+                    "NETWORK_MODE_GLOBAL",
+                    "NETWORK_MODE_LTE_CDMA_EVDO",
+                    "NETWORK_MODE_LTE_GSM_WCDMA",
+                    "NETWORK_MODE_LTE_CDMA_EVDO_GSM_WCDMA",
+                    "NETWORK_MODE_LTE_ONLY",
+                    "NETWORK_MODE_LTE_WCDMA",
+                    "NETWORK_MODE_TDSCDMA_ONLY",
+                    "NETWORK_MODE_TDSCDMA_WCDMA",
+                    "NETWORK_MODE_LTE_TDSCDMA",
+                    "NETWORK_MODE_TDSCDMA_GSM",
+                    "NETWORK_MODE_LTE_TDSCDMA_GSM",
+                    "NETWORK_MODE_TDSCDMA_GSM_WCDMA",
+                    "NETWORK_MODE_LTE_TDSCDMA_WCDMA",
+                    "NETWORK_MODE_LTE_TDSCDMA_GSM_WCDMA",
+                    "NETWORK_MODE_TDSCDMA_CDMA_EVDO_GSM_WCDMA",
+                    "NETWORK_MODE_LTE_TDSCDMA_CDMA_EVDO_GSM_WCDMA"};
+            for (int i= 0;i<=NetworkTypeString.length-1; i ++){
+                networkTypeHash.put(i,NetworkTypeString[i]);
+            }
+        }
+        value = networkTypeHash.get(networkType).toString();
         try {
             Field field = Class.forName("com.android.internal.telephony.RILConstants").getField(value);
             result = field.getInt(null);
         } catch (NoSuchFieldException e) {
-            result = 0;
+            result = -1;
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
-            result = 0;
+            result = -1;
             e.printStackTrace();
         } catch (IllegalAccessException e) {
-            result = 0;
+            result = -1;
             e.printStackTrace();
         }
         return result;
@@ -447,7 +479,7 @@ public class SmartNet {
             public void onFinish() {
                 timerDone = true;
                 timerStart = false;
-                setPreferredNetworkType(mCoreDualSim.getSubscriptionId(),getRILConstants("GSM_ONLY"));
+                setPreferredNetworkType(mCoreDualSim.getSubscriptionId(),checkRILConstants(0));
                 Log.d("SmartNet2.0","setTimer(I)V: Switch network type");
             }
         };
