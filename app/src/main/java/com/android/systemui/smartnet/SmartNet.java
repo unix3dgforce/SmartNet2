@@ -506,6 +506,7 @@ public class SmartNet {
                     }
                 }
             } else {
+
                 if ((!timerStart) && (!chargingState) && (!CallState)) {
                     //Save Network Type Start Timer
                     saveCurrentPrefferedNetworkType();
@@ -522,7 +523,11 @@ public class SmartNet {
 
     private void BatteryCharging(Intent mIntent){
         int status = mIntent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-        chargingState = status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL;
+        if (MiuiCoreSettingsPreference.getKeyParam(mContext,"smartnet_charging_control") != 0) {
+            chargingState = status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL;
+        } else {
+            chargingState = false;
+        }
     }
 
 
