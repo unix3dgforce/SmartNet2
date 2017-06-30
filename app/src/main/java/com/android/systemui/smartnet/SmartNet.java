@@ -74,7 +74,7 @@ public class SmartNet {
         mCoreDualSim = SmartNetCoreDualSim.getInstance(mContext);
         mTelephonyManager = new TelephonyManager(mContext);
         if (MiuiCoreSettingsPreference.getKeyParam(mContext,"mobiledata_activity")!=0){
-
+            if (timerDone) {return;}
             if (getStateWiFiData() && getConnectedWiFiData()){ setPreferredNetworkTypeWiFiOn(); return;}
             if (mConnectivityManager != null){
                 if (mConnectivityManager.getMobileDataEnabled()){
