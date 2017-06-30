@@ -426,6 +426,7 @@ public class SmartNet {
                 networkTypeHash.put(i,NetworkTypeString[i]);
             }
         }
+        if (networkType == -1) { return -1;}
         value = networkTypeHash.get(networkType).toString();
         try {
             Field field = Class.forName("com.android.internal.telephony.RILConstants").getField(value);
