@@ -391,6 +391,7 @@ public class SmartNet {
         mIntentFilter.addAction("android.intent.action.PHONE_STATE");
         mIntentFilter.addAction("android.intent.action.SCREEN_ON");
         mIntentFilter.addAction("android.intent.action.SCREEN_OFF");
+        mIntentFilter.addAction("android.intent.action.BATTERY_CHANGED");
         context.registerReceiver(mIntent,mIntentFilter);
     }
 
@@ -479,7 +480,7 @@ public class SmartNet {
             public void onFinish() {
                 timerDone = true;
                 timerStart = false;
-                setPreferredNetworkType(mCoreDualSim.getSubscriptionId(),checkRILConstants(0));
+                setPreferredNetworkType(mCoreDualSim.getSubscriptionId(),checkRILConstants(1));
                 Log.d("SmartNet2.0","setTimer(I)V: Switch network type");
             }
         };
@@ -488,6 +489,7 @@ public class SmartNet {
 
     private void TimerIntentAction(boolean state) {
         int timeToCompletion = MiuiCoreSettingsPreference.getKeyParam(mContext, "smartnet_timer_value");
+        Log.d("SmartNet2.0", "TimerIntentAction(Z)V: Charging State="+chargingState);
         if (timeToCompletion > 0) {
             if (state) {
                 if ((timerDone) && (cTimer != null)) {
