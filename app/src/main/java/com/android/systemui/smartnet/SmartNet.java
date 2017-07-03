@@ -431,6 +431,7 @@ public class SmartNet {
             }
         }
         if (networkType == -1) { return -1;}
+        if (networkType == 90) { networkType = 0;}
         value = networkTypeHash.get(networkType).toString();
         try {
             Field field = Class.forName("com.android.internal.telephony.RILConstants").getField(value);
