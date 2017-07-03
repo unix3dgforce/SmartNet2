@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -24,6 +26,7 @@ import com.android.internal.telephony.RILConstants;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SmartNet {
@@ -396,6 +399,7 @@ public class SmartNet {
         mIntentFilter.addAction("android.intent.action.SCREEN_ON");
         mIntentFilter.addAction("android.intent.action.SCREEN_OFF");
         mIntentFilter.addAction("android.intent.action.BATTERY_CHANGED");
+        //mIntentFilter.addAction("android.net.wifi.SCAN_RESULTS");
         context.registerReceiver(mIntent,mIntentFilter);
     }
 
@@ -537,8 +541,19 @@ public class SmartNet {
             chargingState = false;
         }
     }
+/*
+    private void WiFiControl(){
+        WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+        List<ScanResult> results = wifiManager.getScanResults();
+        for (final ScanResult ap : results) {
+            Log.d("SmartNet2.3","SSID: "+ap.SSID+" level: "+ap.level);
+        }
+        List<WifiConfiguration> configured = wifiManager.getConfiguredNetworks();
+        for (WifiConfiguration config : configured) {
+            Log.d("SmartNet2.3",config.SSID);
+        }
 
-
+    }*/
     class Receiver extends BroadcastReceiver{
 
         @Override
@@ -549,6 +564,12 @@ public class SmartNet {
             if("android.intent.action.PHONE_STATE".equals(mIntent)){
                 CallIntentAction(intent);
             }
+
+           /* if ("android.net.wifi.SCAN_RESULTS".equals(mIntent)){
+
+            WiFiControl();
+            }*/
+
             if (("android.intent.action.ANY_DATA_STATE".equals(mIntent)) ||
                     ("my.settings.CHANGE_SMART_MOBILE_NETWORK".equals(mIntent)) ||
                     ("android.intent.action.BOOT_COMPLETED".equals(mIntent))) {
