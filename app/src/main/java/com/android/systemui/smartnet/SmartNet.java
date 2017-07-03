@@ -434,7 +434,7 @@ public class SmartNet {
                 networkTypeHash.put(i,NetworkTypeString[i]);
             }
         }
-        if (networkType == -1) { return -1;}
+        if (networkType <= 0) { return -1;}
         if (networkType == 90) { networkType = 0;}
         value = networkTypeHash.get(networkType).toString();
         try {
