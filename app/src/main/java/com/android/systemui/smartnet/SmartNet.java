@@ -313,6 +313,8 @@ public class SmartNet {
 
             }
         }
+        mContext.sendBroadcast(new Intent("my.settings.CHANGE_SMART_MOBILE_NETWORK"));
+
     }
 
 
