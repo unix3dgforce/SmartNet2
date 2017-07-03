@@ -74,7 +74,7 @@ public class SmartNet {
         mCoreDualSim = SmartNetCoreDualSim.getInstance(mContext);
         mTelephonyManager = new TelephonyManager(mContext);
         if (MiuiCoreSettingsPreference.getKeyParam(mContext,"mobiledata_activity")!=0){
-            if (timerDone) {return;}
+            if ((timerDone) || (CallState)) {return;} //CallState add
             if (getStateWiFiData() && getConnectedWiFiData()){ setPreferredNetworkTypeWiFiOn(); return;}
             if (mConnectivityManager != null){
                 if (mConnectivityManager.getMobileDataEnabled()){
@@ -221,16 +221,18 @@ public class SmartNet {
                     return;
                 }
             }
-            if (MobileDataTransfer != 0) {
-                if (lastStateMobileData != 0) {
-                    setStateMobileData(!CallState);
-                }
-            }
             if (WiFiDataTransfer != 0) {
                 if (lastStateWiFiData != 0) {
                     setStateWiFiData(!CallState);
                 }
             }
+
+            if (MobileDataTransfer != 0) {
+                if (lastStateMobileData != 0) {
+                    setStateMobileData(!CallState);
+                }
+            }
+
             Log.d("SmartNet2.0", "setCallPreferredNetworkType(Z)V: Network Type: " + networkType +" lastStateMobileData="+lastStateMobileData+" lastStateWiFiData="+lastStateWiFiData+" WiFiDataTransfer="+WiFiDataTransfer+" MobileDataTransfer="+MobileDataTransfer+ " lastStateNetworkTypeSIM1=" +lastStateNetworkTypeSIM1+ " lastStateNetworkTypeSIM2=" +lastStateNetworkTypeSIM2);
         }
         if (networkType >= 0) {
@@ -451,7 +453,7 @@ public class SmartNet {
                 (phoneState.equals(TelephonyManager.EXTRA_STATE_OFFHOOK))) &&  (!CallState)) {
             SmartNetLastState = MiuiCoreSettingsPreference.getKeyParam(mContext, "mobiledata_activity");
             if (SmartNetLastState != 0)  {
-                Settings.System.putInt(mContext.getContentResolver(), "mobiledata_activity", 0);
+                //Settings.System.putInt(mContext.getContentResolver(), "mobiledata_activity", 0);
                 setCallPreferredNetworkType(true);
             }
             CallState = true;
@@ -459,7 +461,7 @@ public class SmartNet {
 
         if ((phoneState.equals(TelephonyManager.EXTRA_STATE_IDLE)) && (CallState)) {
             if (SmartNetLastState != 0) {
-                Settings.System.putInt(mContext.getContentResolver(), "mobiledata_activity", SmartNetLastState);
+                //Settings.System.putInt(mContext.getContentResolver(), "mobiledata_activity", SmartNetLastState);
                 setCallPreferredNetworkType(false);
             }
             CallState = false;
