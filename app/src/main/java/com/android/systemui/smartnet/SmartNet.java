@@ -103,6 +103,7 @@ public class SmartNet {
 
         if (mCoreDualSim.isDualSIM()){
             SimCard  = MiuiCoreSettingsPreference.getKeyParam(mContext,"mobiledata_SIM_Select");
+            if (SimCard == 0) {SimCard = 1;}
             Log.d("SmartNet2.0","setSimPreferredNetworkType(I)V: SIMid[0]="+SIMid[0]+" SIMid[1]="+SIMid[1]+ " isSIM2Ready()="+mCoreDualSim.isSIM2Ready() + " Network Type=" + networkType + " SIMCard="+SimCard);
             switch (SimCard){
                 case 1:
@@ -154,6 +155,7 @@ public class SmartNet {
     private void setPreferredNetworkType(int[] SIMid, int networkType){
         int SimCard;
         SimCard  = MiuiCoreSettingsPreference.getKeyParam(mContext,"mobiledata_SIM_Select");
+        if (SimCard == 0) {SimCard = 1;}
         ITelephony mITelephony = ITelephony.Stub.asInterface(ServiceManager.checkService("phone"));
         if (mITelephony != null) {
             try {
@@ -247,6 +249,7 @@ public class SmartNet {
         int SimCard;
         int[] SIMid = mCoreDualSim.getSubscriptionId();
         SimCard  = MiuiCoreSettingsPreference.getKeyParam(mContext,"mobiledata_SIM_Select");
+        if (SimCard == 0) {SimCard = 1;}
         ITelephony mITelephony = ITelephony.Stub.asInterface(ServiceManager.checkService("phone"));
         if (mITelephony != null) {
             try {
@@ -285,6 +288,7 @@ public class SmartNet {
         int SimCard;
         int[] SIMid = mCoreDualSim.getSubscriptionId();
         SimCard  = MiuiCoreSettingsPreference.getKeyParam(mContext,"mobiledata_SIM_Select");
+        if (SimCard == 0) {SimCard = 1;}
         ITelephony mITelephony = ITelephony.Stub.asInterface(ServiceManager.checkService("phone"));
         if (mITelephony != null) {
             try {
@@ -443,7 +447,6 @@ public class SmartNet {
             case  90:
                 networkType = 0;
         }
-
         value = networkTypeHash.get(networkType).toString();
         try {
             Field field = Class.forName("com.android.internal.telephony.RILConstants").getField(value);
