@@ -103,7 +103,6 @@ public class SmartNet {
 
         if (mCoreDualSim.isDualSIM()){
             SimCard  = MiuiCoreSettingsPreference.getKeyParam(mContext,"mobiledata_SIM_Select");
-            if (SimCard == 0) {SimCard = 1;}
             Log.d("SmartNet2.0","setSimPreferredNetworkType(I)V: SIMid[0]="+SIMid[0]+" SIMid[1]="+SIMid[1]+ " isSIM2Ready()="+mCoreDualSim.isSIM2Ready() + " Network Type=" + networkType + " SIMCard="+SimCard);
             switch (SimCard){
                 case 1:
@@ -179,6 +178,10 @@ public class SmartNet {
                                 mITelephony.setPreferredNetworkType(SIMid[1], networkType);
                             }
                             break;
+                        default:
+                            if (mCoreDualSim.isSIM1Ready()) {
+                                mITelephony.setPreferredNetworkType(SIMid[0], networkType);
+                            }
                     }
                 } else {
                     mITelephony.setPreferredNetworkType(networkType, 0);
@@ -273,6 +276,10 @@ public class SmartNet {
                                 lastStateNetworkTypeSIM2=mITelephony.getPreferredNetworkType(SIMid[1]);
                             }
                             break;
+                        default:
+                            if (mCoreDualSim.isSIM1Ready()){
+                                lastStateNetworkTypeSIM1=mITelephony.getPreferredNetworkType(SIMid[0]);
+                            }
                     }
                 } else {
                     lastStateNetworkTypeSIM1=mITelephony.getPreferredNetworkType(0);
@@ -312,6 +319,10 @@ public class SmartNet {
                                 mITelephony.setPreferredNetworkType(SIMid[1], lastStateNetworkTypeSIM2);
                             }
                             break;
+                        default:
+                            if (mCoreDualSim.isSIM1Ready()) {
+                                mITelephony.setPreferredNetworkType(SIMid[0], lastStateNetworkTypeSIM1);
+                            }
                     }
                 } else {
                     mITelephony.setPreferredNetworkType(lastStateNetworkTypeSIM1, 0);
