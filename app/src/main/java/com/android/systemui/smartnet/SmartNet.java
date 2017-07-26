@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.wifi.ScanResult;
-import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -15,18 +13,14 @@ import android.os.CountDownTimer;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.preference.MiuiCoreSettingsPreference;
-import android.provider.Settings;
-import android.provider.Telephony;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.android.internal.telephony.ITelephony;
-import com.android.internal.telephony.RILConstants;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class SmartNet {
@@ -44,8 +38,12 @@ public class SmartNet {
     private static boolean timerDone = false;
     private static boolean timerStart = false;
     private static CountDownTimer cTimer = null;
+    private static CountDownTimer cTimerSleepOn = null;
+    private static CountDownTimer cTimerSleepOnAction = null;
     private static boolean chargingState = false;
     private static Map networkTypeHash = new HashMap();
+    private static int timerSleepOn;
+    private static int timeToCompletion;
 
 
 
@@ -518,24 +516,96 @@ public class SmartNet {
         };
     }
 
+    private  void setTimerSleepOn(int value){ //Timer enabled fast mobile data (10,20,30 minute example)
+        cTimerSleepOn = new CountDownTimer(value,1000) {
+            @Override
+            public void onFinish() {
+                //Restore config
+                restoreCurrentPrefferedNetworkType();
+                cTimerSleepOn.cancel();
+                cTimerSleepOn = null;
+                setTimerSleepAction();
+                cTimerSleepOnAction.start();
+                Log.d("SmartNet2.0","setTimerSleepOn(I)V: Enable fast speed mobile data for synchronize");
+            }
 
+            @Override
+            public void onTick(long millisUntilFinished) {
+                if (millisUntilFinished / 1000 <= 10) {
+                    Log.d("SmartNet2.0", "setTimerSleepOn(I)V: Switching seconds remaining: " + millisUntilFinished / 1000);
+                }
+
+            }
+        };
+    }
+
+    private void setTimerSleepAction(){ //Work Time 1 minute
+        cTimerSleepOnAction = new CountDownTimer(60000,1000) {
+            @Override
+            public void onFinish() {
+                //Transition to 2G
+                setPreferredNetworkType(mCoreDualSim.getSubscriptionId(),checkRILConstants(1));
+                cTimerSleepOnAction.cancel();
+                cTimerSleepOnAction = null;
+                setTimerSleepOn(timerSleepOn);
+                cTimerSleepOn.start();
+                Log.d("SmartNet2.0","setTimerSleepAction()V: Disable fast speed mobile data for synchronize");
+            }
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+                if (millisUntilFinished / 1000 <= 10) {
+                    Log.d("SmartNet2.0", "setTimerSleepAction()V: Switching seconds remaining: " + millisUntilFinished / 1000);
+                }
+            }
+        };
+
+    }
+
+    private void controlTimers(int value){
+        switch (value){
+            case 0:
+                cTimer = null;
+                timerDone = false;
+                cTimerSleepOn.cancel();
+                cTimerSleepOn = null;
+                cTimerSleepOnAction.cancel();
+                cTimerSleepOnAction = null;
+                break;
+            case 1:
+                setTimer(timeToCompletion);
+                cTimer.start();
+                setTimerSleepOn(timerSleepOn);
+                cTimerSleepOn.start();
+                timerStart = true;
+                break;
+            case -1:
+                cTimer.cancel();
+                cTimer = null;
+                timerStart = false;
+                cTimerSleepOn.cancel();
+                cTimerSleepOn = null;
+                cTimerSleepOnAction.cancel();
+                cTimerSleepOnAction = null;
+                break;
+        }
+
+    }
     private void TimerIntentAction(boolean state) {
-        int timeToCompletion = MiuiCoreSettingsPreference.getKeyParam(mContext, "smartnet_timer_value");
+        timeToCompletion = MiuiCoreSettingsPreference.getKeyParam(mContext, "smartnet_timer_value");
+        timerSleepOn = MiuiCoreSettingsPreference.getKeyParam(mContext, "smartnet_timer_sleepon_value");
         Log.d("SmartNet2.0", "TimerIntentAction(Z)V: Charging State="+chargingState);
         if (timeToCompletion > 0) {
             if (state) {
                 if ((timerDone) && (cTimer != null)) {
                     //Restore NetworkType
                     restoreCurrentPrefferedNetworkType();
-                    cTimer = null;
-                    timerDone = false;
+                    controlTimers(0);
                     Log.d("SmartNet2.0", "TimerIntentAction(Z)V: Restore Network Type");
                 } else {
                     //Cancel Timer
                     if ((timerStart) && (cTimer != null)) {
-                        cTimer.cancel();
-                        cTimer = null;
-                        timerStart = false;
+                        controlTimers(-1);
                         Log.d("SmartNet2.0", "TimerIntentAction(Z)V: Cancel Timer");
                     }
                 }
@@ -544,9 +614,7 @@ public class SmartNet {
                 if ((!timerStart) && (!chargingState) && (!CallState)) {
                     //Save Network Type Start Timer
                     saveCurrentPrefferedNetworkType();
-                    setTimer(timeToCompletion);
-                    cTimer.start();
-                    timerStart = true;
+                    controlTimers(1);
                     Log.d("SmartNet2.0", "TimerIntentAction(Z)V: Start Timer");
 
                 }
