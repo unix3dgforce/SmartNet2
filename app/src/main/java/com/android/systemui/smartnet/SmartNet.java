@@ -510,6 +510,9 @@ public class SmartNet {
             public void onFinish() {
                 timerDone = true;
                 timerStart = false;
+                //check WiFi enabled
+                setTimerSleepOn(timerSleepOn);
+                cTimerSleepOn.start();
                 setPreferredNetworkType(mCoreDualSim.getSubscriptionId(),checkRILConstants(1));
                 Log.d("SmartNet2.0","setTimer(I)V: Switch network type");
             }
@@ -575,8 +578,6 @@ public class SmartNet {
             case 1:
                 setTimer(timeToCompletion);
                 cTimer.start();
-                setTimerSleepOn(timerSleepOn);
-                cTimerSleepOn.start();
                 timerStart = true;
                 break;
             case -1:
