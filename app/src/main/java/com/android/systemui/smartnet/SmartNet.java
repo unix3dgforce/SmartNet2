@@ -572,10 +572,14 @@ public class SmartNet {
             case 0:
                 cTimer = null;
                 timerDone = false;
-                cTimerSleepOn.cancel();
-                cTimerSleepOn = null;
-                cTimerSleepOnAction.cancel();
-                cTimerSleepOnAction = null;
+                if (cTimerSleepOn != null) {
+                    cTimerSleepOn.cancel();
+                    cTimerSleepOn = null;
+                }
+                if (cTimerSleepOnAction != null) {
+                    cTimerSleepOnAction.cancel();
+                    cTimerSleepOnAction = null;
+                }
                 break;
             case 1:
                 setTimer(timeToCompletion);
@@ -586,10 +590,14 @@ public class SmartNet {
                 cTimer.cancel();
                 cTimer = null;
                 timerStart = false;
-                cTimerSleepOn.cancel();
-                cTimerSleepOn = null;
-                cTimerSleepOnAction.cancel();
-                cTimerSleepOnAction = null;
+                if (cTimerSleepOn != null) {
+                    cTimerSleepOn.cancel();
+                    cTimerSleepOn = null;
+                }
+                if (cTimerSleepOnAction != null) {
+                    cTimerSleepOnAction.cancel();
+                    cTimerSleepOnAction = null;
+                }
                 break;
         }
 
