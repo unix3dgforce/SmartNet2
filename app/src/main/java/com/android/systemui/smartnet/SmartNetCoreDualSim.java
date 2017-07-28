@@ -36,10 +36,10 @@ public class SmartNetCoreDualSim {
     public boolean isDualSIM() {
         return imeiSIM2 != null;
     }
-    public int[] getSubscriptionId(){
+    /*public int[] getSubscriptionId(){
         return mSubscriptionId;
     }
-
+    */
     private SmartNetCoreDualSim(){
 
     }

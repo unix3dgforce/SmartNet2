@@ -97,7 +97,7 @@ public class SmartNet {
 
     private void setSimPreferredNetworkType(int networkType) {
         int SimCard;
-        int[] SIMid = mCoreDualSim.getSubscriptionId();
+        int[] SIMid = mCoreDualSim.getSubId(mContext);
 
         if (mCoreDualSim.isDualSIM()){
             SimCard  = MiuiCoreSettingsPreference.getKeyParam(mContext,"mobiledata_SIM_Select");
@@ -194,7 +194,8 @@ public class SmartNet {
         int networkType;
         int WiFiDataTransfer;
         int MobileDataTransfer;
-        int[] SIMid = mCoreDualSim.getSubscriptionId();
+        //int[] SIMid = mCoreDualSim.getSubscriptionId();
+        int[] SIMid = mCoreDualSim.getSubId(mContext);
         WiFiDataTransfer = MiuiCoreSettingsPreference.getKeyParam(mContext,"smartnet_wifi_data_transfer");
         MobileDataTransfer = MiuiCoreSettingsPreference.getKeyParam(mContext,"smartnet_mobile_data_transfer");
         if (CallState) {
@@ -248,7 +249,8 @@ public class SmartNet {
 
     private void saveCurrentPrefferedNetworkType(){
         int SimCard;
-        int[] SIMid = mCoreDualSim.getSubscriptionId();
+        //int[] SIMid = mCoreDualSim.getSubscriptionId();
+        int[] SIMid = mCoreDualSim.getSubId(mContext);
         SimCard  = MiuiCoreSettingsPreference.getKeyParam(mContext,"mobiledata_SIM_Select");
         if (SimCard == 0) {SimCard = 1;}
         ITelephony mITelephony = ITelephony.Stub.asInterface(ServiceManager.checkService("phone"));
@@ -291,7 +293,8 @@ public class SmartNet {
 
     private void restoreCurrentPrefferedNetworkType(){
         int SimCard;
-        int[] SIMid = mCoreDualSim.getSubscriptionId();
+        //int[] SIMid = mCoreDualSim.getSubscriptionId();
+        int[] SIMid = mCoreDualSim.getSubId(mContext);
         SimCard  = MiuiCoreSettingsPreference.getKeyParam(mContext,"mobiledata_SIM_Select");
         if (SimCard == 0) {SimCard = 1;}
         ITelephony mITelephony = ITelephony.Stub.asInterface(ServiceManager.checkService("phone"));
@@ -338,7 +341,8 @@ public class SmartNet {
 
     public void setPreferredNetworkTypeWiFiOn() {
         int networkType;
-        int[] SIMid = mCoreDualSim.getSubscriptionId();
+        //int[] SIMid = mCoreDualSim.getSubscriptionId();
+        int[] SIMid = mCoreDualSim.getSubId(mContext);
         networkType = checkRILConstants(MiuiCoreSettingsPreference.getKeyParam(mContext, "mobiledata_WiFiOn"));
         //networkType = getRILConstants(Settings.System.getString(mContext.getContentResolver(),"mobiledata_WiFiOn"));
         switch (networkType) {
@@ -515,7 +519,7 @@ public class SmartNet {
                     setTimerSleepOn(timerSleepOn);
                     cTimerSleepOn.start();
                 }
-                setPreferredNetworkType(mCoreDualSim.getSubscriptionId(),checkRILConstants(1));
+                setPreferredNetworkType(mCoreDualSim.getSubId(mContext),checkRILConstants(1));
                 Log.d("SmartNet2.0","setTimer(I)V: Switch network type");
             }
         };
@@ -549,7 +553,7 @@ public class SmartNet {
             @Override
             public void onFinish() {
                 //Transition to 2G
-                setPreferredNetworkType(mCoreDualSim.getSubscriptionId(),checkRILConstants(1));
+                setPreferredNetworkType(mCoreDualSim.getSubId(mContext),checkRILConstants(1));
                 cTimerSleepOnAction.cancel();
                 cTimerSleepOnAction = null;
                 setTimerSleepOn(timerSleepOn);
