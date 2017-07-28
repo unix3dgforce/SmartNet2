@@ -511,7 +511,7 @@ public class SmartNet {
                 timerDone = true;
                 timerStart = false;
                 //check WiFi enabled
-                if (!getStateWiFiData() && !getConnectedWiFiData()) {
+                if (!getStateWiFiData() && !getConnectedWiFiData() && timerSleepOn > 0) {
                     setTimerSleepOn(timerSleepOn);
                     cTimerSleepOn.start();
                 }
