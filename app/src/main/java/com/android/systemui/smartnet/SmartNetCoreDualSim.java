@@ -48,7 +48,7 @@ public class SmartNetCoreDualSim {
         mSmartNetCoreDualSim = new SmartNetCoreDualSim();
 
         TelephonyManager telephonyManager = ((TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE));
-        mSmartNetCoreDualSim.mSubscriptionId = getSubId(context);
+        //mSmartNetCoreDualSim.mSubscriptionId = getSubId(context);
         //mSmartNetCoreDualSim.imeiSIM1 = telephonyManager.getDeviceId();
         mSmartNetCoreDualSim.imeiSIM1 = null;
         mSmartNetCoreDualSim.imeiSIM2 = null;
@@ -93,14 +93,28 @@ public class SmartNetCoreDualSim {
         return mSmartNetCoreDualSim;
     }
 
-    private static int[] getSubId(Context mContext){
+    public int[] getSubId(Context mContext){
         int[] SubId = new int[2];
         int i =0;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1){
             List<SubscriptionInfo> mSubscriptionInfo = SubscriptionManager.from(mContext).getActiveSubscriptionInfoList();
             if (mSubscriptionInfo != null){
                 for (SubscriptionInfo subInfo : mSubscriptionInfo){
-                    SubId[i] = subInfo.getSubscriptionId();
+                    if (isSIM1Ready && i == 0) {
+                        SubId[i] = subInfo.getSubscriptionId();
+                        i++;
+                        continue;
+                    }
+                    if (isSIM2Ready && i == 1){
+                        SubId[i] = subInfo.getSubscriptionId();
+                        i++;
+                        continue;
+                    }
+
+                    if (isSIM2Ready) {
+                        SubId[i+1] = subInfo.getSubscriptionId();
+                        continue;
+                    }
                     i++;
                 }
             }
